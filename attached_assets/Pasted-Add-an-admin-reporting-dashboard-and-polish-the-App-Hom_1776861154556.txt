@@ -1,0 +1,55 @@
+Add an admin reporting dashboard and polish the App Home tab. Do not modify or remove anything from Phases 1–5. Only add to it.
+
+Create a new reports.js module that exports:
+getStats()
+
+Reads all data from the DB and returns:
+
+Total opted-in users
+Total rounds run so far
+Total pairs matched (all time)
+% of matches where metAt is not null (meeting confirmation rate)
+Most active participants (users who have been matched the most)
+Current scheduler status (active or paused, current schedule description)
+
+
+
+
+Extend the App Home tab with two views — one for regular users, one for admins:
+Regular user view (same as Phase 2, but add):
+
+Their full match history: who they were matched with and when
+Whether they met (✅ or ❌) for each past match
+Their next scheduled round date based on the current cron expression
+
+Admin view:
+
+Shown only if the user is in a hardcoded list of admin Slack User IDs (store in .env as ADMIN_USER_IDS, comma-separated)
+A summary dashboard in Block Kit showing all stats from getStats()
+A match history table: each round, who was paired, and whether they met
+Current scheduler config: status, next run date, cron expression
+Buttons for: Run Now, Pause, Resume — each triggers the same logic as the slash commands
+
+
+Extend /krafna-admin with new subcommands:
+
+/krafna-admin stats — posts the full stats summary as an ephemeral message to the admin
+/krafna-admin history — shows all rounds with pairs and meeting confirmation status
+/krafna-admin export — generates a plain text summary of all match history (formatted as a code block) that the admin can copy
+
+
+Polish pass — apply these improvements across the whole app:
+
+All bot messages should use Block Kit (not plain text) for a cleaner look
+All confirmations (join, leave, pause, resume) should include a relevant emoji
+Error messages should be friendly and descriptive, not raw error dumps
+If a user runs /krafna-admin commands but is not in ADMIN_USER_IDS, reply with an ephemeral "You don't have permission to use this command"
+
+
+New environment variable needed in Replit Secrets:
+
+ADMIN_USER_IDS — comma-separated list of Slack User IDs who have admin access (e.g. U123456,U789012)
+To find your Slack User ID: click your name in Slack → Profile → three dot menu → Copy Member ID
+
+
+At the end, confirm if any new scopes are needed in the Slack API dashboard.

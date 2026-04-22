@@ -1,0 +1,67 @@
+Add user-facing notifications and feedback collection. Do not modify or remove anything from Phases 1, 2, 3, or 4. Only add to it.
+
+Create a new notifications.js module that exports:
+notifyPairs(app, pairs)
+
+Takes the Bolt app instance and an array of pairs from saveMatches()
+For each pair, sends a DM to both users using app.client.conversations.open then app.client.chat.postMessage
+The DM message should include:
+
+A warm intro: who they've been matched with (use <@USERID> to mention them)
+A randomly selected icebreaker question from a hardcoded list of 10 questions
+A prompt to reach out and schedule a time to chat
+
+
+
+Icebreaker questions list (hardcoded):
+
+What's a skill you've been meaning to learn?
+What's the best meal you've had recently?
+What's a project you're most proud of this year?
+If you could work from anywhere for a month, where would it be?
+What's a book, podcast, or show you've enjoyed lately?
+What did you want to be when you grew up?
+What's something most people at work don't know about you?
+What's your go-to way to recharge after a busy week?
+What's a tool or app you couldn't live without?
+If you could switch roles with anyone in the company for a day, who would it be?
+
+sendReminder(app, match)
+
+Sends a follow-up DM to both users in a match 3 days after the match was created
+Only sends if match.metAt is still null
+Message should be friendly, not pushy — just a gentle nudge
+
+sendFeedbackRequest(app, match)
+
+Sends a DM to both users 7 days after the match was created
+Message asks: "Did you get to meet with @person? 👍 Yes / 👎 Not yet"
+The 👍 and 👎 are interactive buttons using Block Kit
+When clicked, update match.metAt with the current timestamp (if 👍) or leave as null (if 👎)
+Confirm the response with a short thank you message
+
+
+Extend scheduler.js:
+
+After saveMatches(), call notifyPairs(app, pairs)
+Add a second cron job that runs daily at 9am and:
+
+Finds all matches where createdAt was 3 days ago and metAt is null → calls sendReminder()
+Finds all matches where createdAt was 7 days ago → calls sendFeedbackRequest()
+
+
+
+
+Extend /krafna-admin run:
+
+After saving matches, also call notifyPairs() so manual runs also send DMs
+
+
+New scope needed in Slack API dashboard:
+
+Add im:write to Bot Token Scopes
+Add chat:write is already there ✅
+Reinstall the app after adding the scope
+
+
+At the end, confirm which scopes need to be added and whether the app needs to be reinstalled.

@@ -1,0 +1,53 @@
+Add automated scheduling to the existing app. Do not modify or remove anything from Phases 1, 2, or 3. Only add to it.
+
+Create a new scheduler.js module that exports the following functions:
+startScheduler(app)
+
+Takes the Bolt app instance as a parameter
+Uses node-cron to run matching rounds automatically
+Default schedule: twice a month (1st and 15th of each month at 9:00 AM)
+On each trigger, calls getEligibleUsers() → buildPairs() → saveMatches() from matcher.js
+Logs how many pairs were created and the round number
+Does nothing if the scheduler is paused (check meta:schedulerPaused in DB)
+
+getSchedulerConfig()
+
+Reads scheduler config from DB under key meta:schedulerConfig
+Returns object with: { cronExpression, description, paused }
+Default if not set: { cronExpression: "0 9 1,15 * *", description: "1st and 15th of each month at 9am", paused: false }
+
+setSchedulerConfig(cronExpression, description)
+
+Saves new cron expression and description to DB
+Restarts the cron job with the new schedule
+
+
+Extend db.js with:
+
+getSchedulerConfig() — reads meta:schedulerConfig
+setSchedulerConfig(config) — saves meta:schedulerConfig
+isSchedulerPaused() — reads meta:schedulerPaused, returns boolean
+setSchedulerPaused(boolean) — saves meta:schedulerPaused
+
+
+Extend /krafna-admin with new subcommands:
+
+/krafna-admin schedule — shows the current cron expression and its plain English description
+/krafna-admin schedule set <cronExpression> <description> — updates the schedule. Example: /krafna-admin schedule set "0 9 1,15 * *" "1st and 15th at 9am"
+/krafna-admin pause — pauses the scheduler, replies with confirmation
+/krafna-admin resume — resumes the scheduler, replies with confirmation
+
+
+Extend app.js:
+
+Import scheduler.js and call startScheduler(app) after the app starts
+Install node-cron as a dependency
+
+
+Do not build yet:
+
+No DMs or notifications to matched users
+No feedback collection
+No reporting dashboard
+
+At the end, tell me if anything needs to be updated in the Slack API dashboard.
